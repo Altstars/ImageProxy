@@ -1,5 +1,6 @@
 #/use/local/bin/python3
 
+import os.path
 
 import logging
 import tornado.escape
@@ -12,19 +13,13 @@ from tornado.options import define, options
 
 define("port", default=8888, help="run on the given port", type=int)
 
-from session import Session
 from app.HomeHandler import HomeHandler
-from app.ContentsHandler import ContentsHandler, RelatedContentsHandler
-from app.MagazineHandler import MagazineHandler
 from app.AuthHandlers import AuthLoginHandler, AuthLogoutHandler
 
 class Application(tornado.web.Application):
   def __init__(self):
     handlers = [
         (r"/", HomeHandler),
-        (r"/magazine/(\d+|latest)?", MagazineHandler),
-        (r"/content/(\d+)/related", RelatedContentsHandler),
-        (r"/content/(\d+|random)", ContentsHandler),
         (r"/auth/login", AuthLoginHandler),
         (r"/auth/logout", AuthLogoutHandler),
         ]
