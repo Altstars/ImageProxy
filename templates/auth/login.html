@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+  ログインページ
+
+  <form method="POST">
+    {% raw xsrf_form_html() %}
+    <input type="submit" value="Sign in">
+  </form>
+</body>
+</html>
