@@ -14,17 +14,17 @@ from tornado.options import define, options
 define("port", default=8888, help="run on the given port", type=int)
 
 from app.HomeHandler import HomeHandler
+from app.ImageProxyHandler import ImageProxyHandler
 from app.AuthHandlers import AuthLoginHandler, AuthLogoutHandler
 
 class Application(tornado.web.Application):
   def __init__(self):
     handlers = [
         (r"/", HomeHandler),
-        (r"/auth/login", AuthLoginHandler),
-        (r"/auth/logout", AuthLogoutHandler),
+        (r"/image", ImageProxyHandler),
         ]
     settings = dict(
-        cookie_secret="aowuhdoqu3ahrODQUHD082he08dh202h0odiaej",
+        cookie_secret="aowuhdoqu3ahrOfQUHDr08e0a8dh202h0odiaej",
         template_path=os.path.join(os.path.dirname(__file__), "templates"),
         static_path=os.path.join(os.path.dirname(__file__), "static"),
         debug=True,
