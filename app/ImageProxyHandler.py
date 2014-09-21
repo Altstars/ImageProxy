@@ -11,32 +11,38 @@ class ImageProxyHandler(BaseHandler):
   def get(self, width, height):
     if width is None or height is None:
       width = height = 0
+    width = int(width)
+    height = int(height)
 
     url = self.get_argument("url")
     
-    image = self._get_image(url, width, height)
+    image_path = self._get_image(url, width, height)
 
-
-    with open(image, "rb") as f:
+    with open(image_path, "rb") as f:
       data = f.read()
-      self.set_header('Content-type', "image/jpeg" + self._get_ext(image)[1][1:])
+      self.set_header('Content-type', "image/jpeg" + self._get_ext(image_path)[1][1:])
       self.set_header('Content-length', len(data))
       self.write(data)
  
   def _get_image(self, url, width, height):
-    if width == 0 or height == 0:
-      pass
-    image_url = urllib.request.urlopen(url)
-    content_type = image_url.info().get("content-type")
-    image = image_url.read()
-
     image_path = self._to_image_path(url)
     self._fetch_image(url, image_path)
 
-    image = Image.open(image_path)
+    if not (width == 0 or height == 0):
+      image_path = self._get_thumbnail(image_path, width, height)
 
     return image_path
-  
+
+  def _get_thumbnail(self, original_image_path, width, height):
+    suffix = ".{}x{}".format(width,height)
+    thumb_image_path = suffix.join(os.path.splitext(original_image_path))
+    if not os.path.exists(thumb_image_path):
+      image = Image.open(original_image_path)
+      image.thumbnail((width, height), Image.ANTIALIAS)
+      image.save(thumb_image_path)
+    return thumb_image_path
+
+
   def _fetch_image(self, url, image_path):
     
     if not os.path.exists(image_path):
