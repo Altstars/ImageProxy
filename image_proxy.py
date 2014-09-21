@@ -21,7 +21,7 @@ class Application(tornado.web.Application):
   def __init__(self):
     handlers = [
         (r"/", HomeHandler),
-        (r"/image", ImageProxyHandler),
+        (r"/image/?(?P<width>[\d]+)?/?x?(?P<height>[\d]+)?", ImageProxyHandler),
         ]
     settings = dict(
         cookie_secret="aowuhdoqu3ahrOfQUHDr08e0a8dh202h0odiaej",

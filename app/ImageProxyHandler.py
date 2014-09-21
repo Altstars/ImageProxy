@@ -2,26 +2,59 @@
 from app.BaseHandler import BaseHandler
 from models.model import *
 import urllib.request
+import os.path
+import hashlib
+
+from PIL import Image
 
 class ImageProxyHandler(BaseHandler):
-  def get(self):
+  def get(self, width, height):
+    if width is None or height is None:
+      width = height = 0
+
     url = self.get_argument("url")
     
-    image = self._get_image(url)
-    self.set_header('Content-type', image["content-type"])
-    self.set_header('Content-length', len(image["data"]))
-    self.write(image["data"])
+    image = self._get_image(url, width, height)
+
+
+    with open(image, "rb") as f:
+      data = f.read()
+      self.set_header('Content-type', "image/jpeg" + self._get_ext(image)[1][1:])
+      self.set_header('Content-length', len(data))
+      self.write(data)
  
-    self.render("index.html")
-  def _get_image(self, url):
+  def _get_image(self, url, width, height):
+    if width == 0 or height == 0:
+      pass
     image_url = urllib.request.urlopen(url)
     content_type = image_url.info().get("content-type")
     image = image_url.read()
 
-    return {
-        "content-type":content_type,
-        "data":image,
-    }
+    image_path = self._to_image_path(url)
+    self._fetch_image(url, image_path)
+
+    image = Image.open(image_path)
+
+    return image_path
+  
+  def _fetch_image(self, url, image_path):
+    
+    if not os.path.exists(image_path):
+      image_url = urllib.request.urlopen(url)
+      image = image_url.read()
+      f = open(image_path, "wb")
+      f.write(image)
+      f.close()
+
+  def _to_image_path(self, url):
+    return "images/originals/" + hashlib.sha256(url.encode("utf-8")).hexdigest() + self._get_ext(url)
+
+  def _get_ext(self, path):
+    return os.path.splitext(path)[1]
+
+
+  def _search_image_by_cache(self,url):
+    pass
 
 
 
